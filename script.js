@@ -20,10 +20,12 @@ function copyEmail(){
 $$('[data-copy-email]').forEach(b=>b.addEventListener('click',copyEmail));
 
 /* ---------------- contact form ---------------- */
-/* Messages go through FormSubmit, which forwards them to EMAIL. To use another service, change ENDPOINT. */
+/* Messages go through Web3Forms, which emails them to the address its access key belongs to.
+   The access key is not a secret: Web3Forms designs it to sit in public page code. */
 (function contactForm(){
   const f=$('#msgForm');if(!f)return;
-  const ENDPOINT='https://formsubmit.co/ajax/'+EMAIL;
+  const ENDPOINT='https://api.web3forms.com/submit';
+  const ACCESS_KEY='ddaeb09f-533b-4ab4-8fb3-231d047e337e';
   const status=$('#msgStatus'),btn=$('#msgSend');
   const say=(t,kind)=>{status.textContent=t;status.dataset.kind=kind||''};
   f.addEventListener('submit',async e=>{
@@ -31,14 +33,15 @@ $$('[data-copy-email]').forEach(b=>b.addEventListener('click',copyEmail));
     if(f.elements._honey.value)return;
     const d={name:f.elements.name.value.trim(),email:f.elements.email.value.trim(),message:f.elements.message.value.trim()};
     if(!d.name||!d.email||!d.message){say('Fill in your name, email and a message first.','bad');return}
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)){say('Check your email address. It needs to look like name@example.com.','bad');f.elements.email.focus();return}
     const openMail=()=>{window.location.href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Message from '+d.name+', via your portfolio')+'&body='+encodeURIComponent(d.message+'\n\n'+d.name+'\n'+d.email)};
     btn.disabled=true;say('Sending your message.');
     try{
       if(location.protocol==='file:')throw new Error('local file');
       const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
-        body:JSON.stringify({name:d.name,email:d.email,message:d.message,_subject:'Portfolio message from '+d.name,_replyto:d.email,_template:'table',_captcha:'false'})});
+        body:JSON.stringify({access_key:ACCESS_KEY,subject:'Portfolio message from '+d.name,from_name:'nik-o-o.github.io',name:d.name,email:d.email,message:d.message})});
       const j=await r.json().catch(()=>({}));
-      if(!r.ok||String(j.success)==='false')throw new Error(j.message||'not accepted');
+      if(!r.ok||j.success!==true)throw new Error(j.message||'not accepted');
       f.reset();say('Message sent. I will reply to the address you gave.','ok');
     }catch(err){
       say('This page could not send the message itself, so your email app is opening with it filled in.','bad');openMail();
