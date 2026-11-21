@@ -7,6 +7,7 @@ const reduceMQ=window.matchMedia('(prefers-reduced-motion: reduce)');
 const EMAIL='nikunjpahwa2000@gmail.com';
 const NS='http://www.w3.org/2000/svg';
 const el=(tag,attrs,parent)=>{const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n};
+const track=(name,params)=>{try{if(typeof window.gtag==='function')window.gtag('event',name,params||{})}catch(e){}};
 const esc0=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---------------- toast + copy email ---------------- */
@@ -17,7 +18,8 @@ function copyEmail(){
   const fallback=()=>{const e=$('#emailText');if(!e){toast('Copy did not work here. The address is '+EMAIL);return}const r=document.createRange();r.selectNodeContents(e);const s=getSelection();s.removeAllRanges();s.addRange(r);e.scrollIntoView({block:'center'});toast('Email selected. Press Ctrl+C or ⌘C to copy it.')};
   try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(EMAIL).then(done,fallback)}else fallback()}catch(e){fallback()}
 }
-$$('[data-copy-email]').forEach(b=>b.addEventListener('click',copyEmail));
+$$('[data-copy-email]').forEach(b=>b.addEventListener('click',()=>{copyEmail();track('contact_click',{method:'copy_email'})}));
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="mailto:"]');if(a)track('contact_click',{method:'email'})});
 
 /* ---------------- contact form ---------------- */
 /* Messages go through Web3Forms, which emails them to the address its access key belongs to.
@@ -27,13 +29,16 @@ $$('[data-copy-email]').forEach(b=>b.addEventListener('click',copyEmail));
   const ENDPOINT='https://api.web3forms.com/submit';
   const ACCESS_KEY='ddaeb09f-533b-4ab4-8fb3-231d047e337e';
   const status=$('#msgStatus'),btn=$('#msgSend');
+  const T0=Date.now();
   const say=(t,kind)=>{status.textContent=t;status.dataset.kind=kind||''};
   f.addEventListener('submit',async e=>{
     e.preventDefault();
-    if(f.elements._honey.value)return;
     const d={name:f.elements.name.value.trim(),email:f.elements.email.value.trim(),message:f.elements.message.value.trim()};
     if(!d.name||!d.email||!d.message){say('Fill in your name, email and a message first.','bad');return}
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.email)){say('Check your email address. It needs to look like name@example.com.','bad');f.elements.email.focus();return}
+    /* Invisible traps: a hidden field only bots fill in, and a form completed in under three seconds.
+       Both look like success to the sender and send nothing. */
+    if(f.elements.website.value||Date.now()-T0<3000){f.reset();say('Message sent. I will reply to the address you gave.','ok');return}
     const openMail=()=>{window.location.href='mailto:'+EMAIL+'?subject='+encodeURIComponent('Message from '+d.name+', via your portfolio')+'&body='+encodeURIComponent(d.message+'\n\n'+d.name+'\n'+d.email)};
     btn.disabled=true;say('Sending your message.');
     try{
@@ -42,7 +47,7 @@ $$('[data-copy-email]').forEach(b=>b.addEventListener('click',copyEmail));
         body:JSON.stringify({access_key:ACCESS_KEY,subject:'Portfolio message from '+d.name,from_name:'nik-o-o.github.io',name:d.name,email:d.email,message:d.message})});
       const j=await r.json().catch(()=>({}));
       if(!r.ok||j.success!==true)throw new Error(j.message||'not accepted');
-      f.reset();say('Message sent. I will reply to the address you gave.','ok');
+      f.reset();say('Message sent. I will reply to the address you gave.','ok');track('generate_lead',{method:'contact_form'});
     }catch(err){
       say('This page could not send the message itself, so your email app is opening with it filled in.','bad');openMail();
     }finally{btn.disabled=false}
@@ -183,7 +188,7 @@ window.addEventListener('scroll',onScroll,{passive:true});onScroll();
     Object.keys(nodes).forEach(k=>nodes[k].classList.toggle('is-on',k===id));
     board.innerHTML=`<div><h3>${st.lines.map(l=>`<i class="bul ${l}" aria-hidden="true"></i>`).join('')}<span>${esc0(st.title)}</span></h3><p class="meta">${esc0(st.meta)}</p></div><p class="txt">${esc0(st.txt)}</p><a href="${st.href}">${esc0(st.cta)}</a>`;
   }
-  gSt.addEventListener('click',e=>{const g=e.target.closest('.st');if(g)select(g.dataset.id)});
+  gSt.addEventListener('click',e=>{const g=e.target.closest('.st');if(g){select(g.dataset.id);track('select_content',{content_type:'station',item_id:g.dataset.id})}});
   gSt.addEventListener('mouseover',e=>{const g=e.target.closest('.st');if(g)select(g.dataset.id)});
   gSt.addEventListener('focusin',e=>{const g=e.target.closest('.st');if(g)select(g.dataset.id)});
   gSt.addEventListener('keydown',e=>{
