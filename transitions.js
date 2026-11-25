@@ -11,12 +11,19 @@
       return LINE.indexOf(m ? m[1] : 'index');
     } catch (e) { return -1; }
   }
+  function quiet() {}
   window.addEventListener('pagereveal', function (e) {
-    if (!e.viewTransition) return;
+    var vt = e.viewTransition;
+    if (!vt) return;
+    // A browser may still skip the transition (some embedded browsers do); keep that
+    // out of the console instead of logging an uncaught promise rejection.
+    if (vt.ready) vt.ready.catch(quiet);
+    if (vt.finished) vt.finished.catch(quiet);
+    if (vt.updateCallbackDone) vt.updateCallbackDone.catch(quiet);
     var nav = window.navigation, act = nav && nav.activation;
     if (!act || !act.from || !act.entry) return;
     var a = station(act.from.url), b = station(act.entry.url);
     if (a < 0 || b < 0 || a === b) return;
-    e.viewTransition.types.add(b > a ? 'forward' : 'backward');
+    vt.types.add(b > a ? 'forward' : 'backward');
   });
 })();
