@@ -529,21 +529,44 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,24px);background:var(--ink);color:#fff;padding:14px 20px;border-radius:999px;font-weight:700;font-size:.95rem;opacity:0;pointer-events:none;transition:opacity var(--t),transform var(--t);z-index:60;max-width:calc(100vw - 32px)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 
-/* ---------- page-to-page transitions ----------
-   Chrome and Edge (126+) and Safari (18.2+) animate between pages instead of cutting.
-   The header holds still, the "you are here" bar slides along the nav to the new page,
-   and the content fades through. Other browsers, and reduced motion, navigate as before. */
+/* ---------- page-to-page transitions: the metro moves to the next station ----------
+   Pages are stations in nav order: Home, Experience, Projects, Education, Contact.
+   Going down the line, the current page pulls away to the left as the train picks up
+   speed, and the next page glides in from the right and brakes to a stop. Going back
+   runs the other way. The header is the carriage and holds still; the "you are here"
+   bar travels along the nav like the train on the route map above the doors.
+   transitions.js tells the new page the direction (view transition types). When the
+   browser can't tell the direction, the page fades through instead. Chrome and Edge
+   126+ and Safari 18.2+ only; other browsers and reduced motion switch pages as before. */
 @media (prefers-reduced-motion:no-preference){
   @view-transition{navigation:auto}
 }
 .top{view-transition-name:top}
 :active-view-transition .top{background:var(--ground)}
 ::view-transition{background:var(--ground,#F2F5F8)}
-::view-transition-group(here){animation-duration:300ms;animation-timing-function:cubic-bezier(.2,.7,.2,1)}
+
+/* no direction known: fade through */
 ::view-transition-old(root){animation:vt-out 140ms cubic-bezier(.4,0,1,1) both}
 ::view-transition-new(root){animation:vt-in 260ms cubic-bezier(.2,.7,.2,1) 80ms both}
+::view-transition-group(here){animation-duration:300ms;animation-timing-function:cubic-bezier(.2,.7,.2,1)}
 @keyframes vt-out{to{opacity:0}}
 @keyframes vt-in{from{opacity:0;transform:translateY(8px)}}
+
+/* along the line: the old page pulls away (speeding up, gone in 200 ms), then the next
+   one glides in and brakes to a stop. Movement and fade run on separate clocks so the
+   two pages barely overlap. */
+:root:active-view-transition-type(forward)::view-transition-old(root){animation:metro-to-left 320ms cubic-bezier(.55,0,.9,.35) both,metro-fade-out 200ms linear both}
+:root:active-view-transition-type(forward)::view-transition-new(root){animation:metro-from-right 420ms cubic-bezier(.1,.7,.25,1) 160ms both,metro-fade-in 220ms ease-out 160ms both}
+:root:active-view-transition-type(backward)::view-transition-old(root){animation:metro-to-right 320ms cubic-bezier(.55,0,.9,.35) both,metro-fade-out 200ms linear both}
+:root:active-view-transition-type(backward)::view-transition-new(root){animation:metro-from-left 420ms cubic-bezier(.1,.7,.25,1) 160ms both,metro-fade-in 220ms ease-out 160ms both}
+:root:active-view-transition-type(forward)::view-transition-group(here),
+:root:active-view-transition-type(backward)::view-transition-group(here){animation-duration:580ms;animation-timing-function:cubic-bezier(.65,0,.3,1)}
+@keyframes metro-to-left{to{transform:translateX(-20vw)}}
+@keyframes metro-from-right{from{transform:translateX(20vw)}}
+@keyframes metro-to-right{to{transform:translateX(20vw)}}
+@keyframes metro-from-left{from{transform:translateX(-20vw)}}
+@keyframes metro-fade-out{to{opacity:0}}
+@keyframes metro-fade-in{from{opacity:0}}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
