@@ -175,7 +175,7 @@ window.addEventListener('scroll',onScroll,{passive:true});onScroll();
     const t=el('text',{class:'lbl',x:lx,y:ly,'text-anchor':anchor},g);t.textContent=st.name;
     if(rot)t.setAttribute('transform',`rotate(${rot} ${lx} ${ly})`);
     if(st.sub){const s=el('text',{class:'sub',x:lx,y:ly+18,'text-anchor':anchor},g);s.textContent=st.sub}
-    el('circle',{cx:st.x,cy:st.y,r:24,fill:'transparent'},g);
+    el('circle',{cx:st.x,cy:st.y,r:38,fill:'transparent'},g);
     nodes[st.id]=g;
   });
 
@@ -198,14 +198,23 @@ window.addEventListener('scroll',onScroll,{passive:true});onScroll();
   });
   select('bn');
 
-  /* on narrow screens the map pans sideways: start centred on the current station */
-  const scroller=$('#mapScroll');
-  function centreOnNow(){
+  /* Below desktop width the whole map shows scaled down. Zoom in gives the full-size map,
+     scrolled so the selected station sits in the middle; zoom out returns to the whole map. */
+  const scroller=$('#mapScroll'),panel=$('.map-panel'),zoomBtn=$('#mapZoom'),panText=$('#panText');
+  function centreOn(id){
     const over=scroller.scrollWidth-scroller.clientWidth;if(over<=0)return;
-    const bn=S.find(x=>x.id==='bn');
-    scroller.scrollLeft=Math.max(0,Math.min(over,bn.x/1320*scroller.scrollWidth-scroller.clientWidth/2));
+    const st=S.find(x=>x.id===id)||S.find(x=>x.id==='bn');
+    scroller.scrollLeft=Math.max(0,Math.min(over,st.x/1320*scroller.scrollWidth-scroller.clientWidth/2));
   }
-  centreOnNow();
+  function setZoom(on){
+    panel.classList.toggle('zoomed',on);
+    zoomBtn.setAttribute('aria-pressed',String(on));
+    zoomBtn.querySelector('use').setAttribute('href',on?'#i-zoom-out':'#i-zoom-in');
+    zoomBtn.querySelector('span').textContent=on?'Show whole map':'Zoom in';
+    panText.textContent=on?'Drag the map sideways to see every line.':'Tap a station for details, or zoom in to read every name.';
+    if(on)centreOn(current);else scroller.scrollLeft=0;
+  }
+  if(zoomBtn)zoomBtn.addEventListener('click',()=>{setZoom(!panel.classList.contains('zoomed'));track('map_zoom',{zoomed:panel.classList.contains('zoomed')})});
 
   /* line filter */
   let filter='all';
