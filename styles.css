@@ -101,10 +101,10 @@ strong,b{font-weight:700}
 .top-nav::-webkit-scrollbar{display:none}
 .top-nav a{position:relative;display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;font-weight:600;font-size:.98rem;text-decoration:none;color:var(--ink-2);white-space:nowrap;transition:background var(--t),color var(--t)}
 .top-nav a span{padding-top:.14em}
-@media (max-width:979px){.top-nav{gap:0;padding-inline:calc(var(--pad) - 7px)}.top-nav a{padding:0 7px;font-size:.9rem}.top-nav a[aria-current="page"]::after{left:7px;right:7px}}
+@media (max-width:979px){.top-nav{gap:0;padding-inline:calc(var(--pad) - 7px)}.top-nav a{padding:0 7px;font-size:.9rem}.top-nav a .here-bar{left:7px;right:7px}}
 .top-nav a:hover{background:var(--surface);color:var(--ink)}
 .top-nav a[aria-current="page"]{color:var(--ink);font-weight:800}
-.top-nav a[aria-current="page"]::after{content:"";position:absolute;left:14px;right:14px;bottom:4px;height:4px;border-radius:2px;background:var(--here,var(--eng))}
+.top-nav .here-bar{position:absolute;left:14px;right:14px;bottom:4px;height:4px;border-radius:2px;background:var(--here,var(--eng));view-transition-name:here}
 @media (min-width:980px){
   .top-in{grid-template-columns:auto 1fr auto;grid-template-areas:"brand nav cv";height:72px}
   .top-nav{justify-content:flex-end;overflow:visible;margin:0;padding:0}
@@ -528,6 +528,22 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
 
 .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,24px);background:var(--ink);color:#fff;padding:14px 20px;border-radius:999px;font-weight:700;font-size:.95rem;opacity:0;pointer-events:none;transition:opacity var(--t),transform var(--t);z-index:60;max-width:calc(100vw - 32px)}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- page-to-page transitions ----------
+   Chrome and Edge (126+) and Safari (18.2+) animate between pages instead of cutting.
+   The header holds still, the "you are here" bar slides along the nav to the new page,
+   and the content fades through. Other browsers, and reduced motion, navigate as before. */
+@media (prefers-reduced-motion:no-preference){
+  @view-transition{navigation:auto}
+}
+.top{view-transition-name:top}
+:active-view-transition .top{background:var(--ground)}
+::view-transition{background:var(--ground,#F2F5F8)}
+::view-transition-group(here){animation-duration:300ms;animation-timing-function:cubic-bezier(.2,.7,.2,1)}
+::view-transition-old(root){animation:vt-out 140ms cubic-bezier(.4,0,1,1) both}
+::view-transition-new(root){animation:vt-in 260ms cubic-bezier(.2,.7,.2,1) 80ms both}
+@keyframes vt-out{to{opacity:0}}
+@keyframes vt-in{from{opacity:0;transform:translateY(8px)}}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
