@@ -92,7 +92,7 @@ window.addEventListener('scroll',onScroll,{passive:true});onScroll();
     {id:'bn',x:720,y:300,lines:['eng','ml'],name:'BusinessNext',hi:'बिज़नेसनेक्स्ट',sub:'Noida, 2025 to now',lab:[744,352,'start'],
       title:'BusinessNext',meta:'Data Engineer, October 2025 to now',txt:'I own the PySpark dataflow engine that moves CRM data for banks and insurers. Two 20× speed-ups so far, plus an LLM agent that turns plain English into dataflows.',href:X+'#x-bn',cta:'See this role'},
     {id:'isb',x:880,y:210,lines:['ml','ana'],name:'ISB AMPBA',hi:'आईएसबी',sub:'Expected 2027',lab:[862,168,'end'],
-      title:'ISB, Hyderabad',meta:'Business analytics programme, expected 2027',txt:'The Advanced Management Programme in Business Analytics, alongside full-time work. Every station to the right of this one is a project from it.',href:A+'#education',cta:'See education'},
+      title:'ISB, Hyderabad',meta:'Business analytics programme, expected 2027',txt:'The Advanced Management Programme in Business Analytics, alongside full-time work. Average grade 95.6 out of 100 across 19 courses so far. Every station to the right of this one is a project from it.',href:A+'#education',cta:'See education'},
     {id:'wim',x:980,y:90,lines:['ana'],name:'Wimbledon',lab:[988,72,'start',-38],
       title:'Winning the Next Point',meta:'ISB advanced statistics',txt:'A model of who wins the next point at Wimbledon, using only what is known before the serve. Trained on 326,000 service points.',href:P+'#p-wim',cta:'See this project'},
     {id:'ser',x:990,y:210,lines:['ml'],name:'Speech emotion',lab:[990,242,'middle'],
