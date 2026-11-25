@@ -7,7 +7,7 @@ const reduceMQ=window.matchMedia('(prefers-reduced-motion: reduce)');
 const EMAIL='nikunjpahwa2000@gmail.com';
 const NS='http://www.w3.org/2000/svg';
 const el=(tag,attrs,parent)=>{const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);if(parent)parent.appendChild(n);return n};
-const track=(name,params)=>{try{if(typeof window.gtag==='function')window.gtag('event',name,params||{})}catch(e){}};
+const track=(name,params)=>{try{if(typeof window.gtag==='function')window.gtag('event',name,params||{});if(typeof window.clarity==='function')window.clarity('event',name)}catch(e){}};
 const esc0=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ---------------- toast + copy email ---------------- */
