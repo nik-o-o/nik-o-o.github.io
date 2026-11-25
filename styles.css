@@ -247,6 +247,26 @@ strong,b{font-weight:700}
 .results.is-armed.is-in li:nth-child(4) .cmp-bar{transition-delay:240ms}
 .results.is-armed.is-in li:nth-child(5) .cmp-bar{transition-delay:320ms}
 
+/* ---------- writing ---------- */
+.where a{color:var(--ink);font-weight:700;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:3px;text-decoration-color:var(--ml)}
+.where a:hover{color:var(--ml)}
+.writing{display:grid;gap:clamp(32px,4vw,64px);align-items:start}
+.w-feat{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--rule);border-radius:var(--radius-l);padding:clamp(28px,3vw,44px) clamp(24px,3vw,40px) clamp(24px,3vw,40px)}
+.w-feat::before{content:"";position:absolute;inset:0 0 auto 0;height:6px;background:var(--ml)}
+.w-feat h3{font-size:clamp(1.5rem,2.6vw,2.125rem);font-weight:900;letter-spacing:-.02em;line-height:1.1;text-wrap:balance}
+.w-feat p:not(.kind){margin-top:14px;color:var(--ink-2);max-width:40rem}
+.w-feat .text-link{color:var(--ink);text-decoration-color:var(--ml)}
+.w-feat .text-link:hover{color:var(--ml)}
+.w-feat h3 a,.w-list h3 a{text-decoration:none;transition:color var(--t)}
+.w-feat h3 a:hover,.w-list h3 a:hover{color:var(--ml);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px}
+.w-list li{padding:20px 0;border-top:1px solid var(--rule)}
+.w-list li:last-child{border-bottom:1px solid var(--rule)}
+.w-list .kind{margin-bottom:6px}
+.w-list h3{font-size:1.25rem;font-weight:800;letter-spacing:-.01em;line-height:1.25}
+.w-list p:not(.kind){margin-top:6px;color:var(--ink-2);max-width:36rem}
+.w-more{margin-top:clamp(32px,4vw,48px)}
+@media (min-width:980px){.writing{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}.w-list li:first-child{padding-top:0;border-top:0}}
+
 /* ---------- experience strip ---------- */
 .strip{position:relative;padding-top:56px}
 .strip::before{content:"";position:absolute;left:10px;top:0;width:10px;height:72px;
